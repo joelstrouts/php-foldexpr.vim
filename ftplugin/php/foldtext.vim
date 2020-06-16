@@ -9,22 +9,8 @@
 "                                            instead of the left.
 "           b:phpfold_text_percent     = 0 - Display the percentage of lines the
 "                                            fold represents.
-"
-if exists('b:phpfold_text') && !b:phpfold_text
-    finish
-endif
 
-setlocal foldtext=GetPhpFoldText()
-
-if !exists('b:phpfold_text_right_lines')
-    let b:phpfold_text_right_lines = 0
-endif
-
-if !exists('b:phpfold_text_percent')
-    let b:phpfold_text_percent = 0
-endif
-
-function! GetPhpFoldText()
+function! PhpFoldInfo()
     let line = getline(v:foldstart)
 
     let text = ''
@@ -140,52 +126,94 @@ function! GetPhpFoldText()
         endif
     endif
 
-    let lines = v:foldend-v:foldstart+1
+    " let lines = v:foldend-v:foldstart+1
 
-    let percentage = ''
-    if b:phpfold_text_percent
-        let percentage = printf(" [% 4.1f%%]", (lines*1.0)/line('$')*100)
-    endif
+    " let percentage = ''
+    " if b:phpfold_text_percent
+    "     let percentage = printf(" [% 4.1f%%]", (lines*1.0)/line('$')*100)
+    " endif
 
-    let endtext = printf(" % *d lines", NumColWidth(1), lines)
+    " let endtext = printf(" % *d lines", NumColWidth(1), lines)
 
-    " Start off with the normal, the fold-level dashes and number of lines in the fold.
-    if !b:phpfold_text_right_lines
-        let text = '+' . v:folddashes . endtext . percentage . ': ' . text
-    else
-        " Place the fold-level dashes and number of lines in fold on the right
+    " " Start off with the normal, the fold-level dashes and number of lines in the fold.
+    " if !b:phpfold_text_right_lines
+    "     let text = '+' . v:folddashes . endtext . percentage . ': ' . text
+    " else
+    "     " Place the fold-level dashes and number of lines in fold on the right
 
-        " First, add the indentation back to the text, makes it look nicer.
-        let text = substitute(line, '\S.*', '', '') . text
+    "     " First, add the indentation back to the text, makes it look nicer.
+    "     let text = substitute(line, '\S.*', '', '') . text
 
-        " Determine whether the signs column is being displayed.  The
-        " `sign place` command will list all signs placed, or just
-        " '^@--- Signs ---^@' if no signs are placed.
-        redir => signs
-        silent execute "sign place buffer=" . bufnr("%")
-        redir END
-        let signsWidth = strchars(signs) > 15 ? 2 : 0
+    "     " Determine whether the signs column is being displayed.  The
+    "     " `sign place` command will list all signs placed, or just
+    "     " '^@--- Signs ---^@' if no signs are placed.
+    "     redir => signs
+    "     silent execute "sign place buffer=" . bufnr("%")
+    "     redir END
+    "     let signsWidth = strchars(signs) > 15 ? 2 : 0
 
-        " The amount of space we have to display text: window width less fold
-        " column width,  number column width, and the signs column.
-        let displayWidth = winwidth(0) - &foldcolumn - NumColWidth() - signsWidth
+    "     " The amount of space we have to display text: window width less fold
+    "     " column width,  number column width, and the signs column.
+    "     let displayWidth = winwidth(0) - &foldcolumn - NumColWidth() - signsWidth
 
-        " The text to display on the right
-        let endtext .= percentage . ' +' . v:folddashes
+    "     " The text to display on the right
+    "     let endtext .= percentage . ' +' . v:folddashes
 
-        " Amount of space for text less the line count and fold level dashes
-        let availableWidth = displayWidth - strwidth(endtext)
+    "     " Amount of space for text less the line count and fold level dashes
+    "     let availableWidth = displayWidth - strwidth(endtext)
 
-        " Make sure the display text doesn't need to be truncated.
-        if strwidth(text) > availableWidth
-            let text = strpart(text, 0, availableWidth-2) . ' -' . endtext
-        else
-            let filler = repeat(matchstr(&fillchars, 'fold:\zs.'), displayWidth - strwidth(text . endtext))
-            let text .= filler . endtext
-        endif
-    endif
+    "     " Make sure the display text doesn't need to be truncated.
+    "     if strwidth(text) > availableWidth
+    "         let text = strpart(text, 0, availableWidth-2) . ' -' . endtext
+    "     else
+    "         let filler = repeat(matchstr(&fillchars, 'fold:\zs.'), displayWidth - strwidth(text . endtext))
+    "         let text .= filler . endtext
+    "     endif
+    " endif
 
-    return text
+    " if b:phpfold_text_percent
+    "     let percentage = printf(" [% 4.1f%%]", (lines*1.0)/line('$')*100)
+    " endif
+
+    " let endtext = printf(" % *d lines", NumColWidth(1), lines)
+
+    " " Start off with the normal, the fold-level dashes and number of lines in the fold.
+    " if !b:phpfold_text_right_lines
+    "     let text = '+' . v:folddashes . endtext . percentage . ': ' . text
+    " else
+    "     " Place the fold-level dashes and number of lines in fold on the right
+
+    "     " First, add the indentation back to the text, makes it look nicer.
+    "     let text = substitute(line, '\S.*', '', '') . text
+
+    "     " Determine whether the signs column is being displayed.  The
+    "     " `sign place` command will list all signs placed, or just
+    "     " '^@--- Signs ---^@' if no signs are placed.
+    "     redir => signs
+    "     silent execute "sign place buffer=" . bufnr("%")
+    "     redir END
+    "     let signsWidth = strchars(signs) > 15 ? 2 : 0
+
+    "     " The amount of space we have to display text: window width less fold
+    "     " column width,  number column width, and the signs column.
+    "     let displayWidth = winwidth(0) - &foldcolumn - NumColWidth() - signsWidth
+
+    "     " The text to display on the right
+    "     let endtext .= percentage . ' +' . v:folddashes
+
+    "     " Amount of space for text less the line count and fold level dashes
+    "     let availableWidth = displayWidth - strwidth(endtext)
+
+    "     " Make sure the display text doesn't need to be truncated.
+    "     if strwidth(text) > availableWidth
+    "         let text = strpart(text, 0, availableWidth-2) . ' -' . endtext
+    "     else
+    "         let filler = repeat(matchstr(&fillchars, 'fold:\zs.'), displayWidth - strwidth(text . endtext))
+    "         let text .= filler . endtext
+    "     endif
+    " endif
+
+    return Indent_spaces() . text
 endfunction
 
 " Finds how many characters wide the number column is.
@@ -227,6 +255,17 @@ function! FindNextFunc(lnum)
 
     return -2
 endfunction
+
+" {{{ Indent_spaces ❯
+function! Indent_spaces()
+  let l:indent_num = indent(v:foldstart)
+  let l:spaces = ''
+  for l:space in range(1, indent_num)
+    let l:spaces = l:spaces . ' '
+  endfor
+  return l:spaces
+endfunction
+" }}} Indent_spaces ❮
 
 " Extracts the name and visibility of a function from the given line.
 function! ExtractFuncName(lnum)
